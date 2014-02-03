@@ -39,8 +39,6 @@
 #define ToleranceTemp 10
 #define MaxTemp        110
 
-
-
 #define AddrMode 0
 #define AddrTermpstat12V 1
 #define AddrTermostat220V 2
@@ -92,11 +90,9 @@ int timePressButton=0;
 
 long interval = 100; 
 
-
 float Voltage=0;
 #define R1  21900.0
 #define R2  4580.0
-
 
 #define minValueVoltage 10.0
 #define alertMinVoltage 10.5
@@ -106,24 +102,18 @@ boolean piezoState=false;
 int loopp=0;
 int looppBlinkLed=0;
 
-
 float currentTemp=0.0;
-
-
 byte loop50Hz=0;
 
 byte TimeStartSound=100;
-byte StartSound=false;
-byte SoundUps=false;
+boolean StartSound = false;
 boolean loopSoundState=false;
 int StartSoundloop=0;
-
 int loopSound=0;
+
 boolean playLoopSound=false;
 void setup()
 {
-	
-
 	// Setup the digits array
   // a = 8 b = 4 c = 2 d = 64 e = 32 f = 1 g = 16
 	#pragma region IOSettings
@@ -190,8 +180,7 @@ void setup()
 	if(availableSensor)
 	{
 		sensor.requestTemperatures();
-		currentTemp=sensor.getTempC(insideThermometer);
-		
+		currentTemp=sensor.getTempC(insideThermometer);		
 	}
 	else
 	{
@@ -223,7 +212,6 @@ void loop()
 		availableSensor=sensor.getAddress(insideThermometer, 0);
 		if(availableSensor)
 		{
-			
 			sensor.requestTemperatures();
 			currentTemp=sensor.getTempC(insideThermometer);
 			if(changeModeAvailableSensors)
@@ -231,8 +219,6 @@ void loop()
 				setTermostatTemp12V=termostatTemp12V;
 				setTermostatTemp220V=termostatTemp220V;
 				UpdateLed();
-				
-				
 				changeModeAvailableSensors=false;
 				changeModeNotAvailableSensors=true;
 			}
@@ -244,9 +230,6 @@ void loop()
 			{
 				AvailableAcAndSensor();
 			}
-			
-			
-			
 		}
 		else 
 		{
@@ -259,24 +242,17 @@ void loop()
 				UpdateDisplay();
 				changeModeAvailableSensors=true;
 				changeModeNotAvailableSensors=false;
+				digitalWrite(RelayOutput, HIGH);
 				if(!availableAC)//no ACVoltage
 				{
-					TurnOnInverter();
-					digitalWrite(RelayOutput,HIGH);
+					TurnOnInverter();					
 				}
 				else 
 				{
-						TurnOffInverter();
-						digitalWrite(RelayOutput,HIGH);
-
+					TurnOffInverter();					
 				}
-
 			}
-			
 		}
-
-		
-		
 	}
 	#pragma endregion
 
@@ -285,8 +261,6 @@ void loop()
 	{
 		ckeckBatteryLoop=false;
 		CkeckBattery();
-		
-
 	}
 	#pragma endregion
 
@@ -317,7 +291,6 @@ void loop()
 					termostatTemp220V=tempTermostatTemp220V;
 					EEPROM.write(AddrTermpstat12V,termostatTemp12V);
 					EEPROM.write(AddrTermostat220V,termostatTemp220V);
-
 					UpdateLed();
 				}
 				else
@@ -337,8 +310,6 @@ void loop()
 						NextMode();			
 					}
 				}		
-		
-						
 			}
 			WaitButton();		
 		}
@@ -355,28 +326,23 @@ void loop()
 				{
 					if(mode==2)
 					{
-						
 						tempTermostatTemp12V+=5;
 						if(tempTermostatTemp12V>MaxTemp)
 						{
 							tempTermostatTemp12V=MaxTemp;
 						}
 						setTermostatTemp12V=true;
-						
 					}
 					else 
 					{
-						
 						tempTermostatTemp220V+=5;
 						if(tempTermostatTemp220V>MaxTemp)
 						{
 							tempTermostatTemp220V=MaxTemp;
 						}
 						setTermostatTemp220V=true;
-						
 					}
 					UpdateDisplay();
-					
 				}
 				WaitButton();
 		}
@@ -388,29 +354,24 @@ void loop()
 			if(!digitalRead(DownButton))
 			{
 				if(mode==2)
-				{
-						
+				{						
 					tempTermostatTemp12V-=5;
 					if(tempTermostatTemp12V<=0)
 					{
 						tempTermostatTemp12V=0;
 						setTermostatTemp12V=false;
-					}
-						
+					}						
 				}
 				else 
-				{
-						
+				{						
 					tempTermostatTemp220V-=5;
 					if(tempTermostatTemp220V<=0)
 					{	
 						tempTermostatTemp220V=0;
 						setTermostatTemp220V=false;
-					}
-					
+					}					
 				}
-				UpdateDisplay();
-				
+				UpdateDisplay();				
 			}
 			WaitButton();
 		}
@@ -422,20 +383,11 @@ void loop()
 	availableAC=!digitalRead(AvailableAC220);
 	if(changeStateAvailableAC!=availableAC)
 	{
-		
 		changeStateAvailableAC=availableAC;		
-		Desition();
-	
-	
+		Desition();	
 	}
 	#pragma endregion
 }
-
-
-
-
-
-
 ISR(TIMER1_COMPA_vect)
 {
 	loop50Hz++;
@@ -450,20 +402,18 @@ ISR(TIMER1_COMPA_vect)
 	if(loop50Hz>60)
 	{
 		#pragma region A
-		loopp++;
-		
-		
+		loopp++;		
 		if(upsState)
 		{
 			if(outputState)
 			{
 				digitalWrite(OUTPUT1,LOW);
-					digitalWrite(OUTPUT2,HIGH);
+				digitalWrite(OUTPUT2,HIGH);
 			}
 			else
 			{
 				digitalWrite(OUTPUT2,LOW);
-					digitalWrite(OUTPUT1,HIGH);
+				digitalWrite(OUTPUT1,HIGH);
 			}
 			outputState=!outputState;
 			if(loopSoundState)
@@ -478,23 +428,18 @@ ISR(TIMER1_COMPA_vect)
 						loopSound=0;
 					}
 				}
-			}
-				
+			}				
 		}
 		if(StartSound)
 		{
-			StartSoundloop++;
-			
+			StartSoundloop++;			
 			if(StartSoundloop==500)
 			{
 				StartSound=false;
 				loopSoundState=true;
-				loopSound=0;
-			
+				loopSound=0;			
 			}
 		}
-		
-	
 		if(loopp==100) // 5 sec.
 		{
 			checkTemp=true;
@@ -508,11 +453,9 @@ ISR(TIMER1_COMPA_vect)
 		}
 		if(loopp>300)
 		{
-		
 			ckeckBattery=true;
 			loopp=0;
 		}
-
 		if(enterSetupMode)
 		{
 			looppBlinkLed++;
@@ -521,8 +464,7 @@ ISR(TIMER1_COMPA_vect)
 				looppBlinkLed=0;
 				digitalWrite(led[mode],!digitalRead(led[mode]));
 			}
-		}
-		
+		}		
 			
 #pragma endregion 
 		loop50Hz=0;
@@ -532,10 +474,7 @@ ISR(TIMER1_COMPA_vect)
 		piezoState=!piezoState;
 		digitalWrite(Piezo,piezoState);
 	}
-	
-
 }
-
 
 void pin32Interrupt()
 {
@@ -546,56 +485,46 @@ void pin32Interrupt()
 
 void Start()
 	{
-			cli();          // disable global interrupts
-			TCCR1A = 0;     // set entire TCCR1A register to 0
-			TCCR1B = 0;     // same for TCCR1B
-			 TCNT1  =0;//initialize counter value to 0
-			// set compare match register to desired timer count:
-			OCR1A =40;
+		cli();          // disable global interrupts
+		TCCR1A = 0;     // set entire TCCR1A register to 0
+		TCCR1B = 0;     // same for TCCR1B
+			TCNT1  =0;//initialize counter value to 0
+		// set compare match register to desired timer count:
+		OCR1A =40;
 
-			// turn on CTC mode:
-			TCCR1B |= (1 << WGM12);
-			// Set CS10 and CS12 bits for 64 prescaler:
-			TCCR1B |= (1 << CS10);
-			TCCR1B |= (1 << CS11);
-			// enable timer compare interrupt:
-			TIMSK1 |= (1 << OCIE1A);
-			sei();
+		// turn on CTC mode:
+		TCCR1B |= (1 << WGM12);
+		// Set CS10 and CS12 bits for 64 prescaler:
+		TCCR1B |= (1 << CS10);
+		TCCR1B |= (1 << CS11);
+		// enable timer compare interrupt:
+		TIMSK1 |= (1 << OCIE1A);
+		sei();
 	}
 
 void Stop()
 	{
-		TCCR1B &= ~(_BV(CS10) | _BV(CS11) | _BV(CS12));
-		
+		TCCR1B &= ~(_BV(CS10) | _BV(CS11) | _BV(CS12));		
 	}
-
 
 void TurnOffUps()
 	{
-		
 		TurnOffInverter();
 		digitalWrite(OutputDisplay,LOW);
 		digitalWrite(RelayOutput,LOW);
 		 /* Setup pin2 as an interrupt and attach handler. */
-	
-
-	
 		set_sleep_mode(SLEEP_MODE_PWR_DOWN);  
 		sleep_enable();
-		attachInterrupt(0, pin32Interrupt, LOW);
-	
+		attachInterrupt(0, pin32Interrupt, LOW);	
 		sleep_mode();		
-		sleep_disable(); 
-			
+		sleep_disable(); 			
 	}
 
 void TurnOffInverter()
 {
-	
-			upsState=false;
-			
-			digitalWrite(OUTPUT1, LOW);
-			digitalWrite(OUTPUT2, LOW);
+	upsState=false;			
+	digitalWrite(OUTPUT1, LOW);
+	digitalWrite(OUTPUT2, LOW);
 }
 
 void TurnOnInverter()
@@ -604,10 +533,8 @@ void TurnOnInverter()
 	digitalWrite(RelayOutput,HIGH);
 }
 
-
 void NextMode()
-{
-	
+{	
 	if(mode==3)
 	{	
 		mode=0;
